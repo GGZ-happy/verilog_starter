@@ -1,0 +1,16 @@
+Labels <= 6 characters
+Labels start with a letter, and only contain letters and numbers
+Global labels like function addresses, Stack, and non-static data start with a capital.
+All other labels start with a lowercase letter.
+
+Opcodes and directives sit at the 3rd tabstop (i.e. after only 2 tabs).
+Exactly a space separates operands in an instruction.
+Comments sit at the 7th tabstop.
+No trailing whitespace except 1 newline at the end of the file.
+
+In the data section, function pointers come first.
+Then single outputs/inputs. These are clearly marked in comments.
+Then constants. First positive in increasing order, then negative in decreasing order.
+Then other single data.
+Then arrays.
+Then the stack.

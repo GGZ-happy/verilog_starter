@@ -1,0 +1,42 @@
+		addi 0 4 0		//R4 = 0, just creates a dependency for this load
+		lw 0 4 numfib	//R4 = 10 (compute first 10 Fibonacci numbers)
+		lw 0 6 mem		//R6 = base memory address to store Fibonacci numbers
+		addi 0 2 0		//R2 = 0 (fib_0)		//cache line end
+		addi 0 1 1		//R1 = 1 (fib_1)
+		addi 0 1 1		//redundant but switches order of lw and addi when issued
+		addi 0 1 1		//redundant but switches order of lw and addi when issued
+		lw 0 3 zero		//R3 = 0 (loop index)
+		sw 6 2 0		//store fib_0 at memory[R6 + 0]
+		addi 3 3 1		//R3 = 1
+		sw 6 1 1		//store fib_1 at memory[R6 + 1]
+		addi 6 6 1
+		addi 6 6 1		//increment store pointer, need to keep cache lines
+		lw 0 15 times	//loads number of times to loop
+		lw 0 14 zero	//keep cache lines lined up
+loop	add 1 2 5		//R5 = fib_n + fib_n-1 (next Fibonacci)
+		sw 6 5 0		//store new value at memory[R6 + R3]
+		add 0 1 2		//R2 = previous fib_n (old R1)
+		add 0 5 1		//R1 = new Fibonacci number (R5)
+		addi 3 3 1		//increment loop index R3
+		beq 3 4 rst		//if R3 == N, reset
+		addi 6 6 1		//increment memory offset
+		noop			//puts beq on seond half of cache line
+		beq 0 0 loop	//repeat
+rst		lw 0 4 numfib	//R4 = 10 (compute first 10 Fibonacci numbers)
+		lw 0 6 mem		//R6 = base memory address to store Fibonacci numbers
+		addi 0 2 0		//R2 = 0 (fib_0) //cache line end
+		addi 0 1 1		//R1 = 1 (fib_1)
+		lw 0 3 zero		//R3 = 0 (loop index)
+		sw 6 2 0		//store fib_0 at memory[R6 + 0]
+		addi 3 3 1		//R3 = 1
+		sw 6 1 1		//store fib_1 at memory[R6 + 1]
+		addi 14 14 1	//increment outer loop
+		addi 3 3 1		//increment loop index R3
+		beq 14 15 done	//if R3 == N, done
+		beq 0 0 loop
+done	halt
+times	.fill 6			//number of times to calculate all fibonocci nums INPUT
+numfib	.fill 46		//number of fibonacci numbers to calculate (46 is the max for reg size) INPUT
+zero 	.fill 0			//zero
+mem		.fill output	//starting point of memory for storing fib nums
+output	.fill 0			OUTPUT

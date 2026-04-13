@@ -1,0 +1,31 @@
+		lw 0 2 inputN	; R2 = N (loop counter)
+		lw 0 1 one		; R1 = result = 1
+		lw 0 3 one		; R3 = i = 1
+		lw 0 4 neg1		; R4 = -1
+main	beq 2 0 done	; if N == 0, halt
+		add 1 0 6		; R6 = multiplicand = result
+		add 0 0 7		; R7 = product = 0
+		add 3 0 5		; R5 = multiplier = i
+mult	beq 5 0 mDone	; if multiplier == 0, done
+		add 7 6 7		; product += multiplicand
+		add 5 4 5		; multiplier--
+		beq 0 0 mult
+mDone	add 7 0 1		; result = product
+		lw 0 5 limit	; R5 = 5040
+		beq 1 5 reset	; if result == 5040, reset
+		lw 0 5 one		; R5 = 1
+		add 3 5 3		; i++
+		add 2 4 2		; N--
+		beq 0 0 main
+reset	add 2 4 2		; N--
+		beq 2 0 done
+		lw 0 1 one		; result = 1
+		lw 0 3 one		; i = 1
+		beq 0 0 main
+done	sw 0 1 result	; store final result
+		halt
+result	.fill 0			OUTPUT
+inputN	.fill 60		INPUT
+one		.fill 1
+neg1	.fill -1
+limit	.fill 479001600

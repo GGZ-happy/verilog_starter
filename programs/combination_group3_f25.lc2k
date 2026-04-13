@@ -1,0 +1,57 @@
+		lw 0 1 n
+		lw 0 2 r
+		lw 0 4 Faddr	load function address
+		jalr 4 7		call function
+		sw 0 3 result
+		halt
+Comb	lw 0 6 one		r6 = 1
+		sw 5 7 Stack	save returnAddr
+		add 5 6 5		incr stackPtr
+		sw 5 1 Stack	save n
+		add 5 6 5		incr stackPtr
+		sw 5 2 Stack	save r
+		add 5 6 5		incr stackPtr
+		beq 1 2 base	n==r
+		beq 0 2 base	r == 0
+		lw 0 6 neg1		r6= -1
+		add 1 6 1		n=n-1
+		lw 0 6 one		r6 = 1
+		sw 5 3 Stack	save returnVal (caller save)
+		add 0 0 3		r3=0
+		add 5 6 5		incr stackPtr
+		jalr 4 7		comb(n-1, r)
+		lw 0 6 neg1		r6 = -1
+		add 5 6 5		decr stackPtr
+		lw 5 4 Stack	r4 = old returnVal
+		add 3 4 3		update returnVal
+		lw 0 4 Faddr	restore r4
+		add 2 6 2		r=r-1
+		lw 0 6 one		r6 = 1
+		sw 5 3 Stack	save returnVal (caller save)
+		add 0 0 3		r3=0
+		add 5 6 5		incr stackPtr
+		jalr 4 7		comb(n-1, r-1)
+		lw 0 6 neg1		r6 = -1
+		add 5 6 5		decr stackPtr
+		lw 5 4 Stack	r4 = old returnVal
+		add 3 4 3		update returnVal
+		lw 0 4 Faddr	restore r4
+		beq 0 0 done	skip base case
+base	lw 0 6 one
+		add 0 6 3		set r3=1
+done	lw 0 6 neg1
+		add 5 6 5		decr stackPtr
+		lw 5 2 Stack	load r
+		add 5 6 5		decr stackPtr
+		lw 5 1 Stack	load n
+		add 5 6 5		decr stackPtr
+		lw 5 7 Stack	load returnAddr
+		add 0 7 6		reg6 = returnAddr
+		jalr 6 7
+Faddr	.fill Comb
+result	.fill 0			OUTPUT
+n		.fill 8			INPUT
+r		.fill 4			INPUT
+one		.fill 1
+neg1	.fill -1
+Stack	.fill 0

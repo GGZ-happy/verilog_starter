@@ -1,0 +1,50 @@
+		lw 0 1 n
+		lw 0 4 Faddr	load function address
+		jalr 4 7		call function
+		sw 0 3 result
+		halt
+stFib	lw 0 6 pos1		load +1 to r6
+		sw 5 7 Stack	push r7 (return addr) to stack
+		add 5 6 5		SP++ (now points to where N will go)
+		beq 0 1 retN	if n == 0 goto retN
+		beq 6 1 retN	if n == 1 goto retN
+		sw 5 1 Stack	push n (r1) to stack
+		add 5 6 5		SP++ (now points to one after N)
+		lw 0 6 neg1		load -1 to r6
+		add 1 6 1		r1--
+		lw 0 4 Faddr	set up recursive call
+		jalr 4 7		recursively call Fib, now r3=fib(n-1)
+		add 0 3 2		r2 = r3
+		lw 0 6 neg1		r6 = -1
+		add 5 6 5		SP-- (now points to show to n)
+		lw 5 1 Stack	read n from stack
+		lw 0 6 pos1		r6=1
+		add 5 6 5		SP++ (now back to one after n)
+		sw 5 2 Stack	store r2 on the stack
+		add 5 6 5		SP++ (now back to one after n)
+		lw 0 6 neg2		load -2 to r6
+		add 1 6 1		r1 -= 2
+		lw 0 4 Faddr	set up recursive call
+		jalr 4 7		recursively call Fib, now r3=fib(n-1)
+		lw 0 6 neg1		load -1 to r6
+		add 5 6 5		SP-- (now points to return addr)
+		lw 5 2 Stack	pop r2 back from the stack
+		add 0 3 4		r4 = r3
+		add 4 2 3		r3 = r4 + r2 (return fib(n-1) + fib(n-2))
+		lw 0 6 neg2		load -2 to r6
+		add 5 6 5		SP -= 2 (now points to return addr)
+		lw 5 7 Stack	r1 = return address from stack
+		jalr 7 4		return
+retN	add 1 0 3		n is still in r1, r3 = r1
+		lw 0 6 neg1		load -1 to r6
+		add 5 6 5		SP-- (now points to return addr)
+		lw 5 7 Stack	r1 = return address from stack
+		jalr 7 4		return
+Faddr	.fill stFib
+result	.fill 0			OUTPUT
+n		.fill 12		INPUT
+pos1	.fill 1
+pos2	.fill 2
+neg1	.fill -1
+neg2	.fill -2
+Stack	.fill 0

@@ -1,0 +1,45 @@
+		lw 0 1 n
+		lw 0 4 Faddr	//load function address
+		jalr 4 7 		//call function
+		sw 0 3 ans
+		halt
+fib		sw 5 7 Stack	//save return address
+		lw 0 2 one		//load value 1 into reg 2
+		add 5 2 5		//increment stack pointer
+		sw 5 1 Stack	//save current n to stack.
+		add 5 2 5		//increment stack pointer
+		beq 1 0 base	//base case n ==0		//save register 7 on stack first
+		beq 1 2 base	//base case n == 1
+		lw 0 2 neg1		// load -1 into reg2
+		add 1 2 1		// decrement n - 1
+		lw 0 4 Faddr	// load address fib (n-1)
+		jalr 4 7 		// call fib(n-1)
+		lw 0 2 neg1		//load 1 into reg 2
+		add 1 2 1		//n-1 = n-2
+		sw 5 3 Stack	// push "running sum" into stack (n-1)
+		lw 0 2 one		//load one to reg2
+		add 5 2 5		//increment stack pointer
+		lw 0 4 Faddr	// load address fib
+		jalr 4 7 		// call fib(n-2)
+		lw 0 2 neg1		//load 1 into reg2
+		add 5 2 5		//Stack-- //stack always points one beyond
+		lw 5 6 Stack	//load (n-2) reg3?
+		add 3 6 3
+		add 5 2 5		//decrement pointer
+		lw 5 1 Stack	//loading r1
+		add 5 2 5		// Stack--
+		lw 5 7 Stack	//load return address
+		jalr 7 4 		// jump back to main
+base	lw 0 2 neg1		//load -1 into reg2
+		add 2 5 5		//decrement stack
+		add 0 1 3		// reg 1 into 3
+		lw 5 1 Stack	//load n back into reg 1
+		add 2 5 5		// decrement stack again
+		lw 5 7 Stack	//load return address
+		jalr 7 4 		// jump back to function
+Faddr	.fill fib
+ans		.fill 0			OUTPUT
+n		.fill 9			INPUT
+one		.fill 1
+neg1	.fill -1
+Stack	.fill 0

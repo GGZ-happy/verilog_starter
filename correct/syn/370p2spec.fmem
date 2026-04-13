@@ -1,0 +1,16 @@
+Exit status:
+@@@ System halted after 32 instructions
+Final Unified Memory contents (hexadecimal : decimal : ascii):
+@@@ mem[0x00000] = 0x20100009 :   537919497
+@@@ mem[0x00001] = 0x2040000b :   541065227
+@@@ mem[0x00002] = 0x54700000 :  1416626176
+@@@ mem[0x00003] = 0x40100001 :  1074790401
+@@@ mem[0x00004] = 0x400ffffd :  1074790397
+@@@ mem[0x00005] = 0x60000000 :  1610612736
+@@@ mem[0x00006] = 0x2020000a :   538968074
+@@@ mem[0x00007] = 0x1200001 :    18874369
+@@@ mem[0x00008] = 0x57600000 :  1465909248
+@@@ mem[0x00009] = 0x00005 :           5
+@@@ mem[0x0000a] = 0xffffffff :          -1
+@@@ mem[0x0000b] = 0x00006 :           6
+@@@

@@ -1,0 +1,44 @@
+		lw 0 1 n		# r1 = n
+		lw 0 2 a		# r2 = a = 0
+		sw 5 2 Stack
+		addi 5 5 1
+		lw 0 3 b		# r3 = b = 1
+		sw 5 3 Stack
+		addi 5 5 1
+		lw 0 6 one		# r6 = 1
+		beq 0 6 brMiss
+fibLp	beq 1 0 doneA	# if n == 0 return a
+		beq 1 6 doneB	# if n == 1 return b
+		add 2 3 4		# r4 = a + b
+		beq 0 6 brMiss
+		sw 5 4 Stack
+		beq 0 6 brMiss
+		addi 5 5 1
+		beq 0 6 brMiss
+		add 0 3 2		# a = b
+		add 0 4 3		# b = a+b
+		addi 1 1 -1		# n = n - 1
+		beq 0 6 brMiss
+		beq 0 0 fibLp	# loop again
+doneA	add 0 2 7		# r7 = a
+		beq 0 6 brMiss
+		beq 0 0 done
+doneB	add 0 3 7		# r7 = b
+done	sw 0 7 return
+		beq 0 6 brMiss
+		lw 0 4 count
+loop	beq 0 4 doneBr
+		addi 4 4 -1
+		nand 4 2 3
+		nor 4 4 1
+		beq 0 0 loop
+doneBr	halt
+brMiss	noop
+return	.fill 0			OUTPUT
+n		.fill 46		INPUT
+zero	.fill 0
+one		.fill 1
+a		.fill 0
+b		.fill 1
+count	.fill 327
+Stack	.fill 0			OUTPUT

@@ -1,0 +1,37 @@
+		lw 0 2 runTot	// running factorial product
+		lw 0 3 mulTot	// holds multiplication total
+		lw 0 4 mask		// starting mask = 1
+		lw 0 5 index	// bit index
+		lw 0 6 max		// max bits (31)
+		lw 0 7 one		// constant 1
+		lw 0 1 in		// load n (input)
+		addi 0 0 0		// no-op
+factL	beq 1 7 done	// if n == 1 . done
+		add 1 0 8		// copy n into reg8 (multiplier)
+		add 2 0 9		// copy running total into reg9 (multiplicand)
+		lw 0 4 mask		// reset mask = 1
+		lw 0 5 index	// reset index = 0
+		lw 0 3 mulTot	// reset mulTot = 0
+		nand 8 8 8		// nor the multiplier before multiply
+formul	beq 5 6 endmul	// if index == max bits, end multiply
+		nor 4 4 10		// invert mask
+		nor 8 10 10		// isolate current bit
+		beq 10 0 else	// if bit == 1
+		add 9 3 3		// add multiplicand to total
+else	add 4 4 4		// shift mask left
+		add 9 9 9		// shift multiplicand left
+		addi 5 5 1		// increment bit index
+		beq 0 0 formul	// jump back to formul loop
+endmul	add 3 0 2		// save mulTot . runTot
+		addi 1 1 -1		// n = n - 1
+		beq 0 0 factL	// loop for next n
+done	sw 0 3 out
+		halt
+out		.fill 0			OUTPUT
+in		.fill 12		INPUT
+one		.fill 1
+runTot	.fill 1
+mask	.fill 1
+index	.fill 0
+max		.fill 32
+mulTot	.fill 0

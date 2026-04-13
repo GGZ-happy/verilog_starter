@@ -1,0 +1,64 @@
+		lw 0 1 n
+		lw 0 4 Faddr	//load function address
+		jalr 4 7		//call function
+		sw 0 3 result
+		halt
+faddr	beq 0 1 sRBase	//beq if n == 0
+		sw 5 1 Stack	//Push X1 to Stack
+		addi 5 5 1		// reg5 = reg5 + 1
+		sw 5 7 Stack	//Push X7 to Stack
+		addi 5 5 1		// reg5 = reg5 + 1
+		addi 1 1 -1		// n = n + -1
+		lw 0 4 Faddr	//load function address
+		jalr 4 7		//call function
+		addi 5 5 -1		// reg5 = reg5 + 1
+		lw 5 7 Stack	//Pull X7
+		addi 5 5 -1		// reg5 = reg5 + 1
+		lw 5 1 Stack	//Pull X1 from Stack
+		addi 3 2 0		//save return to r2 as argument multiplication
+		sw 5 1 Stack	//Push X1 to Stack
+		addi 5 5 1		// reg5 = reg5 + 1
+		sw 5 6 Stack	//Push X6 to Stack
+		addi 5 5 1		// reg5 = reg5 + 1
+		sw 5 7 Stack	//Push X7 to Stack
+		addi 5 5 1		// reg5 = reg5 + 1
+		lw 0 4 MULT		//load multiplication f call
+		jalr 4 7		//call function
+		addi 5 5 -1		// reg5 = reg5 + 1
+		lw 5 7 Stack	//Pull X7
+		addi 5 5 -1		// reg5 = reg5 + 1
+		lw 5 6 Stack	//Pull X6
+		addi 5 5 -1		// reg5 = reg5 + 1
+		lw 5 1 Stack	//Pull X1
+		jalr 7 4		//Go to whoever called you
+sRBase	addi 0 3 1		//Set 3 to one, cus return value
+		jalr 7 4		//Go to whoever called you
+mult	sw 5 7 Stack	//Push X7 to Stack (PC+1)
+		addi 5 5 1		// reg5 = reg5 + 1
+		addi 0 7 0		//reset the counter so it starts at 0
+		addi 1 3 0		//make r1 mcand by placing in r3
+		addi 2 4 0		//make r2 mplier by placing in r4
+		addi 0 1 0		//reset r1 so it starts at 0
+		lw 0 2 mask
+mLoop	lw 0 6 loopCt
+		beq 7 6 end		//if we have looped through loopCt times
+		nor 2 2 8
+		nor 4 4 6
+		nor 8 6 8
+		beq 0 8 iter
+		add 1 3 1
+iter	addi 7 7 1		//increment counter by one
+		add 2 2 2
+		add 3 3 3
+		beq 0 0 mLoop
+end		add 1 0 3
+		addi 5 5 -1		// reg5 = reg5 + 1
+		lw 5 7 Stack	//Pull X7
+		jalr 7 4
+Faddr	.fill faddr
+MULT	.fill mult
+result	.fill 0			OUTPUT
+n		.fill 12		INPUT
+mask	.fill 1
+loopCt	.fill 31
+Stack	.fill -1

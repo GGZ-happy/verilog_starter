@@ -1,0 +1,47 @@
+		addi 0 1 48		// r1 = input
+		addi 0 2 18		// r2 = input
+		lw 0 7 addr		// r7 = addr
+		sw 7 1 addr
+		addi 7 7 -1
+		sw 7 2 addr
+		addi 7 7 -1
+loop	beq 1 2 final	// if r1 = r2, goto final
+		nand 2 2 3		// r3 = -r2 - 1
+		addi 3 3 1		// r3 = -r2
+		add 1 3 4		// r4 = a - b
+		lw 0 5 mask		// r5 = mask
+		nand 4 5 6		// r6 checks r4 r5 masks
+		nand 6 6 6		// r6 = mask
+		beq 6 0 big		// r6 chooses > or <
+		beq 0 0 less	// if a < b, b = b-a.
+big		add 1 3 1		// if a > b, a = a-b
+		beq 0 0 loop
+less	nand 1 1 3		// r3 = -r1 - 1
+		addi 3 3 1		// r3 = -r1
+		add 2 3 2		// b = b-a
+		beq 0 0 loop
+final	sw 7 1 addr
+		lw 7 3 49		// keep updating based on imem (more inst means higher)
+		lw 7 4 48		// update on imem
+		nor 3 4 1
+		addi 7 7 -1
+		beq 7 0 done
+		lw 0 5 mask
+		nand 1 5 6
+		nand 6 6 6
+		beq 6 0 pos
+		beq 0 0 neg
+neg		nand 1 1 1
+		addi 1 1 1
+		add 7 4 2		New inputs are inputted into the system by loading the previous 2 inputs,
+		addi 2 2 27		NOR-ing them, and adding arbitrary values along with the address offset.
+		sw 7 1 addr		This creates 2 new values and the initial
+		addi 7 7 -1		process repeats until the GCD is found.
+		sw 7 2 addr
+		addi 7 7 -1
+pos		beq 7 0 done
+		beq 0 0 loop
+done	noop
+		halt
+mask	.fill 0x80000000
+addr	.fill 180		// increments of 3 OUTPUT

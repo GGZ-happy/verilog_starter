@@ -1,0 +1,39 @@
+		lw 0 1 n		$1 - load n as function input
+		lw 0 4 Faddr	$4 - load function address
+		jalr 4 7		call function
+		beq 0 0 end
+fib		lw 0 6 pos1		start of fib/ $6: 1
+		add 5 6 5		increment stackPtr
+		sw 5 2 Stack	callee save $2
+		add 5 6 5		increment stackPtr
+		sw 5 1 Stack	callee save $1
+		add 5 6 5		increment stackPtr
+		sw 5 7 Stack	callee save $7
+		beq 1 0 base	check n==0
+		beq 1 6 base	check n==1
+		beq 0 0 recur
+base	add 0 1 3		put n from $1 into $3
+		beq 0 0 clean
+recur	lw 0 6 neg1		$6: -1
+		add 1 6 1		$1: n-1
+		jalr 4 7
+		add 0 3 2		$2: return of n-1
+		lw 0 6 neg1		$6: -1, maybe take out
+		add 1 6 1		$1: n-2
+		jalr 4 7		call fib recursively
+		add 2 3 3		$3: return of fib(n-1) + return of fib(n-2)
+clean	lw 0 6 neg1		$6: -1, maybe take out
+		lw 5 7 Stack	callee load $7
+		add 5 6 5		decrement stackPt
+		lw 5 1 Stack	callee load $1
+		add 5 6 5		decrement stackPtr
+		lw 5 2 Stack	callee load $2
+		add 5 6 5		decrement stackPtr
+		jalr 7 6
+end		sw 0 3 n
+		halt
+Faddr	.fill fib
+n		.fill 10		INPUT and OUTPUT
+neg1	.fill -1
+pos1	.fill 1
+Stack	.fill 0

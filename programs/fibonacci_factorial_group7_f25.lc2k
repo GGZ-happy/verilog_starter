@@ -1,0 +1,115 @@
+		lw 0 12 loopy
+beg1	beq 0 12 mend1
+		addi 12 13 0
+beg		beq 0 13 mend
+		addi 0 0 0
+		addi 0 1 0
+		addi 0 2 0
+		addi 0 3 0
+		addi 0 4 0
+		addi 0 5 0
+		addi 0 6 0
+		addi 0 7 0
+		addi 13 1 0
+		addi 13 13 -1
+		addi 0 5 0
+		lw 0 4 Faddr
+		jalr 4 7
+		sw 0 3 mplier
+		addi 0 0 0
+		addi 0 1 0
+		addi 0 2 0
+		addi 0 3 0
+		addi 0 4 0
+		addi 0 5 0
+		addi 0 6 0
+		addi 0 7 0
+		lw 0 14 maddr
+		jalr 14 15
+		sw 0 3 mcand
+		beq 0 0 beg
+mend	sw 0 3 result
+		halt
+		beq 0 0 beg1
+mend1	halt
+mul		lw 0 4 mcand
+		lw 0 2 nloop
+		lw 0 7 zero
+		lw 0 3 none
+begin	beq 0 2 end
+		add 3 2 2
+		lw 0 5 mplier
+		lw 0 1 mone
+		add 0 4 6
+		nor 6 6 6
+		nor 1 1 1
+		nor 6 1 6
+		lw 0 1 mone
+		beq 6 1 add
+		add 7 7 7
+		add 4 4 4
+		lw 0 6 pre
+		nor 6 6 6
+		nor 4 4 4
+		nor 6 4 4
+		beq 0 0 begin
+add		add 7 7 7
+		add 5 7 7
+		add 4 4 4
+		lw 0 6 pre
+		nor 6 6 6
+		nor 4 4 4
+		nor 6 4 4
+		beq 0 0 begin
+end		add 0 7 3
+emem1	jalr 15 14
+fib		sw 5 7 Stack
+		lw 0 2 one
+		add 2 5 5
+		beq 0 1 exit0
+		lw 0 2 one
+		beq 2 1 exit1
+		sw 5 1 Stack
+		add 2 5 5
+		lw 0 4 negO
+		add 4 1 1
+		lw 0 4 Faddr
+rec1	jalr 4 7
+		lw 0 2 negO
+		add 5 2 5
+		lw 5 1 Stack
+		sw 5 3 Stack
+		lw 0 2 one
+		add 2 5 5
+		lw 0 2 negT
+		add 1 2 1
+		lw 0 4 Faddr
+		jalr 4 7
+		lw 0 2 negO
+		add 5 2 5
+		lw 5 2 Stack
+		add 2 3 3
+		beq 0 0 exit
+exit0	lw 0 3 zero
+		beq 0 0 exit
+exit1	lw 0 3 one
+		beq 0 0 exit
+exit	lw 0 2 negO
+		add 2 5 5
+		lw 5 4 Stack
+		jalr 4 2
+Faddr	.fill fib
+maddr	.fill mul
+result	.fill 0			OUTPUT: the product of the first n fibonacci numbers (except 0).
+loopy	.fill 7			INPUT
+zero	.fill 0
+one		.fill 1
+none	.fill -1
+mone	.fill 16384
+pre		.fill 32767
+nloop	.fill 15
+mcand	.fill 1
+mplier	.fill 6203
+negO	.fill -1
+negT	.fill -2
+Stack	.fill 0

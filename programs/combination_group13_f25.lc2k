@@ -1,0 +1,34 @@
+		addi 0 7 Stack	// Set up stack pointer
+		addi 0 1 8		// Set up first argument (n = 9)	INPUT
+		addi 0 2 4		// Set up second argument (k = 5)	INPUT
+		addi 0 5 Comb	// Store address of function
+		jalr 5 6		// Call
+		sw 0 3 result
+		halt
+Comb	beq 2 0 base
+		beq 2 1 base
+		sw 7 1 1		// Push n onto stack
+		sw 7 2 2		// Push k onto stack
+		sw 7 6 3		// Push ret addr onto stack
+		addi 1 1 -1		// Prep args for 1st recursive call
+		addi 7 7 3		// Prep sp for 1st recursive call
+		addi 0 5 Comb	// Store address of function
+		jalr 5 6		// First recursive call
+		addi 7 7 -3
+		sw 7 3 4		// Store call result to stack
+		lw 7 1 1		// Prep args of 2nd recursive call
+		addi 1 1 -1
+		lw 7 2 2
+		addi 2 2 -1
+		addi 7 7 4		// Prep sp for 2nd recursive call
+		addi 0 5 Comb	// Store address of function
+		jalr 5 6		// Second recursive call
+		addi 7 7 -4
+		lw 7 5 4
+		add 3 5 3		// Calculate return value
+		lw 7 6 3		// Pop return address off of stack
+		jalr 6 5		// Return
+base	addi 0 3 1		// Calculate return value
+		jalr 6 5		// Return
+result	.fill 0			OUTPUT
+Stack	.fill 0

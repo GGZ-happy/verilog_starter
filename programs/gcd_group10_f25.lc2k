@@ -1,0 +1,41 @@
+start	lw 12 0 input1
+		lw 12 1 input2
+		lw 12 2 modAdr	// Set r2 to mod function address
+loop	beq 1 12 done	// if b == 0 then halt
+		sw 14 1 Stack	// Store r1 on the Stack (Not storing r0 because we don't care about it anymore)
+		addi 14 14 1	// Increment sp
+		jalr 2 15		// Run a%b
+		addi 0 1 0		// Set b = result
+		addi 14 14 -1	// Decrement sp
+		lw 14 0 Stack	// Set a=b (pulling the value off the Stack)
+		noop
+		beq 0 0 loop	// Loop again
+done	halt			// end of program
+mod		sw 14 2 Stack	// Store r2 on the Stack
+		addi 14 14 1	// Increment sp
+		sw 14 3 Stack	// Store r3 on the Stack
+		addi 14 14 1	// Increment sp
+		sw 14 4 Stack	// Store r4 on the Stack
+		addi 14 14 1	// Increment sp
+		lw 12 4 mask	// Set r4 to bitmask
+		nand 4 4 4		// Set r4 to ~(bitmask)
+mloop	nand 1 1 2		// Set r2 to ~b
+		addi 2 2 1		// Set r2 to -b
+		add 0 2 2		// Set r2 to a-b
+		nand 2 2 3		// Set r3 to ~(a-b)
+		nor 3 4 3		// Set r3 to AND(a-b, bitmask)
+		beq 3 12 mcont	// Keep running mod if a >= b
+mend	addi 14 14 -1	// Decrement sp
+		lw 14 4 Stack	// Restore r4
+		addi 14 14 -1	// Decrement sp
+		lw 14 3 Stack	// Restore r3
+		addi 14 14 -1	// Decrement sp
+		lw 14 2 Stack	// Restore r2
+		jalr 15 11		// Return. Just using 11 as garbage reg
+mcont	addi 2 0 0		// Set a = (a-b)
+		beq 0 0 mloop	// Run again
+input1	.fill 40133		INPUT
+input2	.fill 40267		INPUT
+mask	.fill -2147483648
+modAdr	.fill mod
+Stack	.fill 0			OUTPUT

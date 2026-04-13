@@ -1,0 +1,56 @@
+		lw 0 1 n
+		lw 0 2 r
+		lw 0 4 Caddr	load combination function address
+		jalr 4 7		call function
+		sw 0 3 result
+		halt
+Comb	beq 1 2 case1
+		beq 2 0 case1
+		lw 0 6 negOne
+		add 1 6 1
+		lw 0 6 one
+		sw 5 1 Stack
+		add 5 6 5
+		sw 5 2 Stack
+		add 5 6 5
+		sw 5 7 Stack
+		add 5 6 5
+		sw 5 4 Stack
+		add 5 6 5
+		jalr 4 7
+		lw 0 6 negOne
+		add 5 6 5
+		lw 5 4 Stack
+		add 5 6 5
+		lw 5 7 Stack
+		add 5 6 5
+		lw 5 2 Stack
+		add 5 6 5
+		lw 5 1 Stack
+		add 2 6 2
+		lw 0 6 one
+		sw 5 3 Stack
+		add 5 6 5
+		sw 5 7 Stack
+		add 5 6 5
+		sw 5 4 Stack
+		add 5 6 5
+		jalr 4 7
+		lw 0 6 negOne
+		add 5 6 5
+		lw 5 4 Stack
+		add 5 6 5
+		lw 5 7 Stack
+		add 5 6 5
+		lw 5 6 Stack
+		add 3 6 3
+		jalr 7 4
+case1	lw 0 3 one
+		jalr 7 4
+Caddr	.fill Comb
+result	.fill 0			OUTPUT
+n		.fill 8			INPUT
+r		.fill 4			INPUT
+one		.fill 1
+negOne	.fill -1
+Stack	.fill 0

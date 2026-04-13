@@ -1,0 +1,36 @@
+		lw 0 15 n		load r1 with n (input value)
+		lw 0 2 one		load r2 with 1 (constant)
+fact	add 15 0 1
+		lw 0 4 one		load r4 with 1 (result accumulator)
+		lw 0 5 zero		load r5 with 0 (constant)
+		lw 0 8 mask32	load r8 with 32-bit mask (permanent)
+		beq 1 5 done	if n == 0, factorial is 1, done
+		beq 1 2 done	if n == 1, factorial is 1, done
+loop	beq 1 2 done	if n == 1, we're done
+		add 5 4 6		r6 = result (copy for multiplication)
+		add 5 1 7		r7 = n (counter for multiplication)
+		add 5 5 4		r4 = 0 (reset accumulator)
+mLoop	beq 7 5 mDone	if counter == 0, multiplication done
+		add 4 6 4		r4 = r4 + r6
+		nand 4 8 9		r9 = ~(r4 & mask32) use r9 as temp
+		nand 9 9 4		r4 = ~r9 = r4 & mask (keep lower 32 bits)
+		lw 0 3 neg1		load -1 into r3
+		add 7 3 7		r7 = r7 - 1
+		beq 0 0 mLoop	repeat multiplication loop
+mDone	lw 0 3 neg1		load -1 into r3
+		add 1 3 1		r1 = n - 1 (decrement n)
+		beq 0 0 loop	repeat factorial loop
+done	lw 0 10 resAdr	load result address into r10
+		add 10 15 10
+		sw 10 4 0		store result to memory
+		addi 15 15 -1
+		beq 15 0 1
+		beq 0 0 fact
+		halt
+n		.fill 12		INPUT
+zero	.fill 0
+one		.fill 1
+neg1	.fill -1
+mask32	.fill -1
+resAdr	.fill result
+result	.fill 0			OUTPUT array

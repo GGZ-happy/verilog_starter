@@ -1,0 +1,12 @@
+	lw	0	1	label1		// r1 = mem[label1]
+	add 1	1	2			// r2 = r1 * 2
+	lw	0	3	label2		// r3 = mem[label2]
+	lw 	0	4	label3		// r4 = mem[label3]
+	add	2	3	5			// r5 = r2 + r3
+	sw	0	5	label4		// mem[label4] = r5
+	noop
+	halt
+label1 .fill 0x1111
+label2 .fill 0x2222
+label3 .fill 0x3333
+label4 .fill 0x4444

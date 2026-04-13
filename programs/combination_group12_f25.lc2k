@@ -1,0 +1,53 @@
+		lw 0 1 n		r1 = n
+		lw 0 2 r		r2 = r
+		lw 0 4 Faddr	load func address
+		jalr 4 7		call function
+		sw 0 3 result	store result
+		halt
+Comb	lw 0 6 pos1
+		sw 5 2 Stack	store r to stack (callee)
+		add 5 6 5
+		sw 5 1 Stack	store n to stack (callee)
+		add 5 6 5
+		sw 5 7 Stack	store n to stack (callee)
+		add 5 6 5
+		beq 0 2 end
+		beq 1 2 end
+		lw 0 6 neg1		r6 = -1
+		add 1 6 1		n -= 1
+		lw 0 4 Faddr	overwrite r4 with Faddr
+		jalr 4 7
+		add 2 6 2		r -= 1
+		lw 0 6 pos1
+		sw 5 3 Stack	store return value to stack
+		add 5 6 5
+		lw 0 4 Faddr	overwrite r4 with Faddr
+		jalr 4 7
+		lw 0 6 neg1
+		add 5 6 5
+		lw 5 6 Stack	load return value from stack to add
+		add 3 6 3
+		lw 0 6 neg1
+		add 5 6 5
+		lw 5 7 Stack	load return address from stack
+		add 5 6 5
+		lw 5 1 Stack	load n from stack
+		add 5 6 5
+		lw 5 2 Stack	load r from stack
+		jalr 7 4
+end		lw 0 3 pos1		r3 = 1
+		lw 0 6 neg1
+		add 5 6 5
+		lw 5 7 Stack	load return address from stack
+		add 5 6 5
+		lw 5 1 Stack	load n from stack
+		add 5 6 5
+		lw 5 2 Stack	load r from stack
+		jalr 7 4
+Faddr	.fill Comb
+result	.fill 0			OUTPUT
+n		.fill 8			INPUT
+r		.fill 4			INPUT
+pos1	.fill 1
+neg1	.fill -1
+Stack	.fill 0

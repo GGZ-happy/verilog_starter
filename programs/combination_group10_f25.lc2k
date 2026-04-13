@@ -1,0 +1,52 @@
+		lw 0 1 n
+		lw 0 2 r
+		lw 0 4 Faddr	load function address
+		jalr 4 7		call function
+		sw 0 3 result
+		halt
+func	sw 5 7 Stack	store return address
+		lw 0 6 pos1
+		add 5 6 5		increment SP
+		beq 0 2 equal
+		beq 1 2 equal
+		lw 0 6 neg1
+		add 1 6 1		n--
+		lw 0 6 pos1
+		sw 5 1 Stack	store n-1 onto the Stack
+		add 5 6 5		increment Stack pointer
+		sw 5 2 Stack	store r onto the Stack
+		add 5 6 5		increment Stack pointer
+		lw 0 6 Faddr
+		jalr 6 7		first recursive call
+		lw 0 6 neg1
+		add 5 6 5		decrement Stack pointer
+		lw 5 2 Stack	get r off the Stack
+		add 5 6 5		decrement Stack pointer
+		lw 5 1 Stack	get n - 1 off the Stack
+		add 2 6 2		r--
+		lw 0 6 pos1
+		sw 5 3 Stack	store first return value onto the Stack
+		add 5 6 5		increment Stack pointer
+		lw 0 6 Faddr
+		jalr 6 7		second recursive call
+		lw 0 6 neg1
+		add 5 6 5		decrement Stack pointer
+		lw 5 6 Stack	get first return value
+		add 3 6 3		add both return values
+		lw 0 6 neg1
+		add 5 6 5		decrement Stack pointer
+		lw 5 7 Stack	get old return address
+		jalr 7 6		return
+equal	lw 0 3 pos1		return 1
+		lw 0 6 neg1
+		add 5 6 5		decrement Stack pointer
+		lw 5 7 Stack	get old return address
+		jalr 7 6
+		halt
+Faddr	.fill func
+result	.fill 0			OUTPUT
+n		.fill 8			INPUT
+r		.fill 4			INPUT
+pos1	.fill 1
+neg1	.fill -1
+Stack	.fill 0

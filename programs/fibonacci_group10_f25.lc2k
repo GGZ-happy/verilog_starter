@@ -1,0 +1,39 @@
+		lw 0 1 count
+		lw 0 2 one
+		add 0 0 3
+		add 0 2 4
+		sw 0 3 num1
+		sw 0 4 num2
+		addi 0 5 2
+loop	beq 5 1 verify
+		add 3 4 6
+		add 0 4 3
+		add 0 6 4
+		sw 0 6 result
+		addi 0 7 20
+junk	add 6 3 8
+		nand 8 4 9
+		nor 8 4 10
+		add 9 10 11
+		nand 11 8 12
+		add 12 9 13
+		nor 13 10 14
+		addi 7 7 -1
+		beq 7 0 endj
+		beq 0 0 junk
+endj	addi 5 5 1
+		beq 0 0 loop
+verify	lw 0 3 result
+		addi 3 4 -987
+		beq 4 0 pass
+		lw 0 3 fail
+		halt
+pass	lw 0 3 good
+		halt
+result	.fill 0			OUTPUT
+count	.fill 17		INPUT
+one		.fill 1
+num1	.fill 0
+num2	.fill 0
+fail	.fill -1
+good	.fill 999

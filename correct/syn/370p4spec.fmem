@@ -1,0 +1,8 @@
+Exit status:
+@@@ System halted after 4 instructions
+Final Unified Memory contents (hexadecimal : decimal : ascii):
+@@@ mem[0x00000] = 0x30100006 :   806354950
+@@@ mem[0x00001] = 0x20100017 :   537919511
+@@@ mem[0x00002] = 0x2010001e :   537919518
+@@@ mem[0x00003] = 0x60000000 :  1610612736
+@@@

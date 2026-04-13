@@ -1,0 +1,28 @@
+		lw 0 1 input	*output is reg 7* load reg1 with 5 (symbolic address) - note that this instruction is at address 0
+		lw 0 2 hpos		load reg2 with 'b01111..
+		nor 1 2 3		nor(n, -1) output to reg3, should output 0 if n is negative, 1 if positive
+		beq 1 4 done	if n == 0
+		beq 0 3 done	if n < 0
+		lw 0 6 one		a is reg(5) = 0, b is reg(6) = 1 (do it here to reuse the value)
+		beq 1 6 re1		n == 1
+		beq 0 0 cont	continue
+re1		add 0 6 7		set the output (reg 7) to 1
+		beq 0 0 done
+cont	lw 0 2 neg1		load -1 into reg(2)
+		add 1 2 1		n = n-1
+start	beq 0 1 fin
+		add 5 6 3		reg(3) = a + b
+		add 0 6 5		a = b
+		add 0 3 6		b = a + b
+		add 1 2 1		n = n - 1
+		beq 0 0 start	go back to the beginning of the loop
+fin		add 0 6 7		set output to reg(b)
+done	sw 0 7 res		store output
+		halt			end of program
+stAddr	.fill start		will contain the address of start (2)
+res		.fill 0			return OUTPUT
+input	.fill 46		INPUT
+one		.fill 1
+neg1	.fill -1
+neg2	.fill -2
+hpos	.fill 2147483647 Contains the highest positive number (011..)

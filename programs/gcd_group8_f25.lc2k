@@ -1,0 +1,160 @@
+main	lw 0 14 zero	// r14 = 0
+		lw 14 15 sp		// r15 = stack pointer (stack will grow upwards)
+		lw 14 2 addr	// r2 = address of gcd function
+		lw 14 0 oneA	// r0 = 2
+		lw 14 1 oneB	// r1 = 10
+		jalr 2 3		// store return address in r3, jump to r2
+		addi 0 3 -1		// r3 = r0 - 1 (checking if gcd(10,2) == 2)
+		beq 3 14 end	// error check, if gcd(10, 2) == 1, halt early
+		sw 14 0 oneA	// mem[oneA] = gcd(10,2) = 2
+		lw 14 0 twoA	// r0 = 128
+		lw 14 1 twoB	// r1 = 64
+		jalr 2 3
+		sw 14 0 oneB	// mem[oneB] = gcd(128, 64) = 64
+		lw 14 0 threeA	// r0 = 987
+		lw 14 1 threeB	// r1 = 610
+		jalr 2 3
+		sw 14 0 twoA	// mem[twoA] = 1
+		lw 14 0 fourA	// r0 = 2584
+		lw 14 1 fourB	// r1 = 1597
+		jalr 2 3
+		sw 14 0 twoB	// mem[twoB] = 1
+		lw 14 0 fiveA	// r0 = 233
+		lw 14 1 fiveB	// r1 = 144
+		jalr 2 3
+		sw 14 0 threeA	// mem[threeA] = 1
+		lw 14 0 sixA	// r0 = 377
+		lw 14 1 sixB	// r1 = 233
+		jalr 2 3
+		sw 14 0 threeB	// mem[threeB] = 1
+		lw 14 0 sevenA	// r0 = 514
+		lw 14 1 sevenB	// r1 = 317
+		jalr 2 3
+		sw 14 0 fourA	// mem[fourA] = 1
+		lw 14 0 eightA	// r0 = 1023
+		lw 14 1 eightB	// r1 = 632
+		jalr 2 3
+		sw 14 0 fourB	// mem[fourB] = 1
+		lw 14 0 nineA	// r0 = 841
+		lw 14 1 nineB	// r1 = 520
+		jalr 2 3
+		sw 14 0 fiveA	// mem[fiveA] = 1
+		lw 14 0 tenA	// r0 = 765
+		lw 14 1 tenB	// r1 = 473
+		jalr 2 3
+		sw 14 0 fiveB	// mem[fiveB] = 1
+		lw 14 0 elevA	// r0 = 901
+		lw 14 1 elevB	// r1 = 557
+		jalr 2 3
+		sw 14 0 sixA	// mem[sixA] = 1
+		lw 14 0 twelA	// r0 = 1189
+		lw 14 1 twelB	// r1 = 735
+		jalr 2 3
+		sw 14 0 sixB	// mem[sixB] = 1
+		lw 14 0 thirA	// r0 = 1597
+		lw 14 1 thirB	// r1 = 897
+		jalr 2 3
+		sw 14 0 sevenA	// mem[sevenA] = 1
+		lw 14 0 frtnA	// r0 = 2000
+		lw 14 1 frtnB	// r1 = 1234
+		jalr 2 3
+		sw 14 0 sevenB	// mem[sevenB] = 1
+		lw 14 0 fftnA	// r0 = 1500
+		lw 14 1 fftnB	// r1 = 927
+		jalr 2 3
+		sw 14 0 eightA	// mem[eightA] = 1
+		beq 0 0 end		// end
+gcd		addi 15 15 1	// ++sp (each address stores a word)
+		sw 15 1 0		// callee save r1 onto the stack
+		addi 15 15 1	// ++sp
+		sw 15 2 0		// callee save r2 onto the stack
+		addi 15 15 1	// ++sp
+		sw 15 3 0		// callee save r3 onto the stack
+		addi 15 15 1	// ++sp
+		sw 15 4 0		// callee save r4 onto the stack
+		addi 15 15 1	// ++sp
+		sw 15 5 0		// callee save r5 onto the stack
+		addi 15 15 1	// ++sp
+		sw 15 6 0		// callee save r6 onto the stack
+		addi 15 15 1	// ++sp
+		sw 15 7 0		// callee save r7 onto the stack
+		addi 15 15 1	// ++sp
+		sw 15 8 0		// callee save r8 onto the stack
+		addi 15 15 1	// ++sp
+		sw 15 9 0		// callee save r9 onto the stack
+		addi 15 15 1	// ++sp
+		sw 15 10 0		// callee save r10 onto the stack
+		addi 15 15 1	// ++sp
+		sw 15 11 0		// callee save r11 onto the stack
+loop	nand 1 1 2		// r2 = -r1
+		addi 2 4 1		// r4 = -r1 + 1, (2's complement of r1)
+		add 0 4 5		// r5 = r0 - r1 (diff = r0 + r4)
+		lw 14 6 zero	// r6 = 0
+		beq 5 6 return	// if diff == 0, return r0
+		addi 14 7 -524288	// r7 = 0x800... (sign_mask)
+		nand 5 7 8		// r8 = nand(diff, sign_mask)
+		nand 8 8 9		// r9 = MSB = 1: neg, MSB = 0: pos ( r8 = and(diff, sign mask) )
+		beq 6 9 diffA	// if sign_bit == 0, a = diff: else, compute b - a
+		nand 0 0 10		// r10 = -r0
+		addi 10 11 1	// r11 = -r10 + 1, (2's complement of r0)
+		add 1 11 1		// r1 = r1 - r11 (b = b - a)
+		beq 0 0 loop
+diffA	addi 5 0 0		// r0 = r5 (a = a - b)
+		beq 0 0 loop
+return	lw 15 11 0		// callee load r11 from stack
+		addi 15 15 -1	// --sp
+		lw 15 10 0		// callee load r10 from stack
+		addi 15 15 -1	// --sp
+		lw 15 9 0		// callee load r9 from stack
+		addi 15 15 -1	// --sp
+		lw 15 8 0		// callee load r8 from stack
+		addi 15 15 -1	// --sp
+		lw 15 7 0		// callee load r7 from stack
+		addi 15 15 -1	// --sp
+		lw 15 6 0		// callee load r6 from stack
+		addi 15 15 -1	// --sp
+		lw 15 5 0		// callee load r5 from stack
+		addi 15 15 -1	// --sp
+		lw 15 4 0		// callee load r4 from stack
+		addi 15 15 -1	// --sp
+		lw 15 3 0		// callee load r3 from stack
+		addi 15 15 -1	// --sp
+		lw 15 2 0		// callee load r2 from stack
+		addi 15 15 -1	// --sp
+		lw 15 1 0		// callee load r2 from stack
+		addi 15 15 -1	// --sp
+		jalr 3 12		// jump to main
+end		halt
+zero	.fill 0
+addr	.fill gcd
+oneA	.fill 2
+oneB	.fill 10
+twoA	.fill 128
+twoB	.fill 64
+threeA	.fill 987
+threeB	.fill 610
+fourA	.fill 2584
+fourB	.fill 1597
+fiveA	.fill 233
+fiveB	.fill 144
+sixA	.fill 377
+sixB	.fill 233
+sevenA	.fill 514
+sevenB	.fill 317
+eightA	.fill 1023
+eightB	.fill 632
+nineA	.fill 841
+nineB	.fill 520
+tenA	.fill 765
+tenB	.fill 473
+elevA	.fill 901
+elevB	.fill 557
+twelA	.fill 1189
+twelB	.fill 735
+thirA	.fill 1597
+thirB	.fill 897
+frtnA	.fill 2000
+frtnB	.fill 1234
+fftnA	.fill 1500
+fftnB	.fill 927
+sp		.fill sp

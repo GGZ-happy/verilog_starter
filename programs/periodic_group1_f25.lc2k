@@ -1,0 +1,48 @@
+		lw 0 1 N		# r1 = N (trip count, single-loop)
+		lw 0 2 base		#r2 = &array[0]
+		add 0 3 0
+		add 0 4 0
+		lw 0 5 MASK		# r5 = -1 (0xFFFFFFFF)
+		addi 0 6 1		#r6 = 1 (const +1)
+		lw 0 11 PERIOD	#r11 = K (branch period)
+		add 0 11 8		#r8 = K (periodic counter)
+		add 0 12 0
+loop	lw 2 4 0		# r4 = mem[array[0]]
+		lw 2 9 1		# r9 = mem[array[1]]
+		add 3 4 3		# r3 = r3 + r4 (RAW for r4)
+		addi 4 4 7		#r4 = r4 + 7 (WAR for r4)
+		nand 3 5 3		#r3 = ~r3 (WAW for r3)
+		sw 2 4 0		#mem[array[0]] = r4
+		sw 2 9 1		# mem[array[1]] = r9
+		beq 4 9 eqpath	#Branch #1: r4 == r9 ?
+		add 3 6 3		#(NotEQ path) r3 += 1
+		beq 0 0 aftB1	#100% jump
+eqpath	add 4 6 4		# (EQ path) r4 += 1
+		add 12 6 12		#branch jump count
+aftB1	addi 8 8 -1		#period count r8--
+		beq 8 0 skip	#Branch		#2: jump every k times
+		add 3 6 3		# (NOT do skip) r3 += 1
+		beq 0 0 aftB2	#100&jump
+skip	add 0 11 8		#r8 = K
+		add 4 6 4		# (doskip path) r4 += 1
+		add 12 6 12		#branch jump count
+aftB2	addi 1 1 -1		# r1--
+		beq 1 0 done	# exit loop
+		beq 0 0 loop
+done	sw 0 3 resALU
+		sw 0 4 rLAST
+		sw 0 1 resR1
+		sw 0 8 resR8
+		sw 0 12 nTaken
+		halt
+base	.fill array
+N		.fill 220
+PERIOD	.fill 3			#2~==50%jump,3~==33%,4~==25%...
+MASK	.fill -1
+array	.fill 1
+		.fill 2
+resALU	.fill 0			OUTPUT
+rLAST	.fill 0			OUTPUT
+resR1	.fill 0			OUTPUT
+resR8	.fill 0			OUTPUT
+nTaken	.fill 0			OUTPUT

@@ -1,0 +1,41 @@
+start	addi 0 12 12	INPUT
+		addi 0 5 fact
+		addi 0 6 mul
+fLoop	beq 1 12 end
+		addi 1 1 1
+		addi 1 3 Stack
+		add 1 3 3
+		add 1 3 3
+		jalr 5 7
+		sw 1 2 Stack
+		beq 0 0 fLoop
+end		halt
+fact	addi 3 3 -1
+		sw 3 1 0
+		addi 3 3 -1
+		sw 3 7 0
+		addi 1 4 -1
+		beq 4 0 base
+		addi 1 1 -1
+		jalr 5 7
+		lw 3 11 0
+		addi 3 3 1
+		lw 3 1 0
+		addi 3 3 1
+		jalr 6 7
+		jalr 11 10
+base	addi 0 2 1
+		lw 3 7 0
+		addi 3 3 1
+		lw 3 1 0
+		addi 3 3 1
+		jalr 7 10
+mul		addi 0 8 0
+		addi 1 9 0
+mLoop	beq 9 0 mDone
+		add 8 2 8
+		addi 9 9 -1
+		beq 0 0 mLoop
+mDone	add 8 0 2
+		jalr 7 10
+Stack	.fill 0			OUTPUT Stack[1:INPUT]

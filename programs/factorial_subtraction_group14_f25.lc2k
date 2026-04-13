@@ -1,0 +1,34 @@
+		addi 0 10 0		// ans = 0
+		addi 0 2 12		// n = 12 (start value)		INPUT
+		addi 0 12 12	// constant 12
+		addi 0 13 7		// constant 7 (end value)	INPUT
+		addi 0 6 1
+		addi 0 7 0
+mainL	addi 0 1 1		// factorial accumulator = 1
+		addi 0 3 1		// increm = 1
+		addi 0 4 0		// partial product = 0
+		addi 0 5 1		// inner loop counter = 1
+outL	addi 2 8 1		// n + 1 for comparison
+		beq 3 8 fDone	// if increm == n+1 . factorial done
+		addi 0 4 0
+		addi 0 5 1
+inL		addi 3 9 1		// increm + 1 for comparison
+		beq 5 9 endI	// end inner loop if done
+		add 4 1 4		// multiply using repeated addition
+		addi 5 5 1
+		beq 0 0 inL
+endI	add 4 0 1		// update factorial result
+		addi 3 3 1		// increm++
+		beq 0 0 outL
+fDone	beq 2 12 aCase	// if n == 12 . add case
+		nor 1 1 11		// get -a using two's complement
+		addi 11 11 1
+		add 10 11 10	// ans = ans - a
+		beq 0 0 aftU
+aCase	add 10 1 10		// ans = ans + a (for first factorial)
+aftU	beq 2 13 doneA	// stop when n == 7
+		addi 2 2 -1		// n--
+		beq 0 0 mainL	// repeat for next n
+doneA	sw 0 10 rOut	// store final result in memory
+		halt
+rOut	.fill 0			OUTPUT
