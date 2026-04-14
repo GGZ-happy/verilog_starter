@@ -91,7 +91,8 @@ module stage_id (
             || !accs_mem[1]) 
         && if2id_pipe.valid && !RAW && !WAW
         && !(accs_mem[0] && accs_mem[1])
-        && (line_buf_offset + 1) < `CACHE_BLOCK_SIZE_IN_WORDS;
+        && (line_buf_offset + 1) < `CACHE_BLOCK_SIZE_IN_WORDS
+        && !if2id_pipe.pred_taken[0];
 
     assign insts_dispatched = 
         (!load_complete && id2ex_pipe.valid[1] && id2ex_pipe.opcode[1] == LC2K_LW) ? 2'd0 : 

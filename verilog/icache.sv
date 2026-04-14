@@ -32,11 +32,13 @@ logic [NUM_LINES-1 : 0]  cache_valid;
 logic [tag_bits-1:0]    cache_tag   [NUM_LINES-1 : 0];
 MEM_BLOCK               cache_data  [NUM_LINES-1 : 0];
 
+// input analysis
 logic [line_idx_bits-1:0] find_idx;
 logic [tag_bits-1:0] find_tag;
 assign find_idx = if_addr[block_off_bits +: line_idx_bits];
 assign find_tag = if_addr[block_off_bits+line_idx_bits +: tag_bits];
 
+// hit analysis
 logic cache_hit;
 assign cache_hit = cache_valid[find_idx] && cache_tag[find_idx] == find_tag;
 

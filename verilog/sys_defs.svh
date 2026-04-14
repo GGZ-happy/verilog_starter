@@ -16,6 +16,7 @@
 `define ICACHE_NUM_LINES 16
 // BTB-related
 `define BTB_ENTRIES 8
+`define BANKS 2
 // uOPQ-related
 `define UOPQ_DEPTH 8
 

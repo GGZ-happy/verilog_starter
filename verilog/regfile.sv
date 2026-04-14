@@ -27,7 +27,7 @@ module regfile (
     always_comb begin
         for (p = 0; p < 4; ++p) begin
             // Handle internal forwarding
-            unique if (write_en[0] && write_idx[0] == read_idx[p])
+            if (write_en[0] && write_idx[0] == read_idx[p])
                 read_out[p] = write_data[0];
             else if (write_en[1] && write_idx[1] == read_idx[p])
                 read_out[p] = write_data[1];
