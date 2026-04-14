@@ -63,7 +63,7 @@ always_ff @(posedge clock) begin
         cache_valid <= '0;
     end else if (mem_valid) begin
         cache_valid[fill_idx] <= 1'b1;
-        cache_tag[fill_idx] <= find_tag;
+        cache_tag[fill_idx] <= fill_tag;
         cache_data[fill_idx] <= mem_data;
     end
 

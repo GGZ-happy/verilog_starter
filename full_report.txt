@@ -1,0 +1,50 @@
+Average CPI                                        1.323394             1.323394            
+Average TPI (ns/instr)                             19.850606            19.850606           
+
+Testbench                                          Pre-Syn CPI          Post-Syn CPI        
+--------------------------------------------------------------------------------------------
+370p1spec                                          1.882353             1.882353            
+370p2spec                                          2.218750             2.218750            
+370p3spec                                          2.500000             2.500000            
+370p4spec                                          2.000000             2.000000            
+branch_storm_group4_f25                            1.454545             1.454545            
+combination_group10_f25                            1.365332             1.365332            
+combination_group12_f25                            1.255490             1.255490            
+combination_group13_f25                            1.415987             1.415987            
+combination_group18_f25                            1.097727             1.097727            
+combination_group3_f25                             1.245022             1.245022            
+factorial_group10_f25                              1.226002             1.226002            
+factorial_group11_f25                              1.144823             1.144823            
+factorial_group13_f25                              1.058566             1.058566            
+factorial_group17_f25                              1.166402             1.166402            
+factorial_group9_f25                               1.242098             1.242098            
+factorial_subtraction_group14_f25                  1.201402             1.201402            
+fibonacci_factorial_group7_f25                     1.358055             1.358055            
+fibonacci_group10_f25                              1.002245             1.002245            
+fibonacci_group13_f25                              0.942781             0.942781            
+fibonacci_group16_f25                              1.234877             1.234877            
+fibonacci_group17_f25                              1.322234             1.322234            
+fibonacci_group18_f25                              0.873239             0.873239            
+fibonacci_group19_f25                              1.373313             1.373313            
+fibonacci_group2_f25                               1.452857             1.452857            
+fibonacci_group6_f25                               1.338608             1.338608            
+fibonacci_group9_f25                               0.792176             0.792176            
+gcd_group10_f25                                    1.477371             1.477371            
+gcd_group15_f25                                    1.193417             1.193417            
+gcd_group8_f25                                     1.105568             1.105568            
+periodic_group1_f25                                1.116018             1.116018            
+reg_coverage_group5_f25                            0.936185             0.936185            
+walkthrough                                        1.428571             1.428571            
+walkthroughNoop                                    1.250000             1.250000            
+
+Output Diff Check
+--------------------------------------------------------------------------------------------
+  No differences with correct output.
+
+Synthesis Timing : NO VIOLATION
+Worst Slack      : 0.03 ns  (tightest met slack)
+
+Synthesis Area and Power
+--------------------------------------------------------------------------------------------
+  Total Dynamic Power : 30.6048 mW
+  Total Area          : 2229331.842898
