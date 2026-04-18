@@ -17,6 +17,10 @@ module alu (
     input ADDR        offset,
     output logic      eq,
     output WORD       result
+    // for btb
+    output logic [1:0] btb_update_en,
+    output ADDR  [1:0] btb_update_pc,
+    output ADDR  [1:0] btb_update_target
 );
 
     assign eq = valA == valB;
@@ -159,4 +163,18 @@ module stage_com (
             wb2rf_pipe.next_pc = 'x;
         end
     end
+
+
+    ////////////////////////////////////////////////
+    //                 btb update                 //
+    ////////////////////////////////////////////////
+
+    generate
+    for (i = 0; i <= 1; ++i) begin : btb_update
+        assign btb_update_en[i] = wb2rf_pipe.valid[i]
+            && id2ex_pipe.opcode[i] == LC2K_BEQ && eq[i];
+        assign btb_update_pc[i] = id2ex_pipe.pc[i];
+        assign btb_update_target[i] = branch_target[i];
+    end
+    endgenerate
 endmodule // stage_com

@@ -88,18 +88,30 @@ module stage_if (
     logic [`CACHE_BLOCK_OFFSET_BITS-1:0] start_off;
     assign start_off = PC_reg[`CACHE_BLOCK_OFFSET_BITS-1:0];
 
-    logic [3:0] masked_pred;
+    logic [3:0] masked_pred; // first branch mask
     always_comb begin
         masked_pred = '0;
         if (start_off <= 2'd0 && raw_pred[0]) masked_pred[0] = 1'b1;
         else if (start_off <= 2'd1 && raw_pred[1]) masked_pred[1] = 1'b1;
         else if (start_off <= 2'd2 && raw_pred[2]) masked_pred[2] = 1'b1;
         else if (raw_pred[3]) masked_pred[3] = 1'b1;
-    end //明天从这里开始
+    end
+
+    // Final predict reg
+    logic [3:0] line_pred;
+    ADDR [3:0] line_tgt;
+    // Final predict result
+    logic pred_dispatched;
+    ADDR pred_target;
+
+    assign pred_dispatched = if2id_pipe.valid && (
+                            (if2id_pipe.pred_taken[0] && insts_dispatched >= 2'd1) ||
+                            (if2id_pipe.pred_taken[1] && insts_dispatched >= 2'd2));
+    assign pred_target = if2id_pipe.pred_taken[0] ? line_tgt[line_buf_offset] : line_tgt[line_buf_offset + 1];
 
     // Check if this buffer is fully dispatched
     logic fully_dispatched;
-    assign fully_dispatched = !if2id_pipe.valid || (line_buf_offset + insts_dispatched) == 3'd4;
+    assign fully_dispatched = !if2id_pipe.valid || (line_buf_offset + insts_dispatched) >= 3'd4;
     // Check if the next buffer line is prepared
     logic next_line_buf_valid;
     assign next_line_buf_valid = ic_valid && ic_addr == PC_line_addr;
@@ -107,11 +119,14 @@ module stage_if (
     ADDR NPC;  // address of inst we're fetching in the next cycle
     // When there's a mispredict, unconditionally take the next PC from EX
     // Otherwise push the next cache line when the last is fully dispatched
-    assign NPC = mispredict ? next_pc : // jump to next pc if mispredict
-        btb_hit ? btb_target : // jump to predicted pc target
-        (fully_dispatched && next_line_buf_valid) 
-            ? (PC_line_addr + `CACHE_BLOCK_SIZE_IN_WORDS) //jump to new buffer line if is fully dispatched
-            : PC_reg;
+    assign NPC = mispredict ? next_pc:
+                pred_dispatched ? pred_target:
+                (fully_dispatched && next_line_buf_valid) ? (PC_line_addr + `CACHE_BLOCK_SIZE_IN_WORDS): 
+                PC_reg;
+
+    // record next dispatch place
+    logic [`CACHE_BLOCK_OFFSET_BITS-1:0] next_dispatch_off;
+    assign next_dispatch_off = line_buf_offset + insts_dispatched;
 
     always_ff @(posedge clock) begin
         if (reset) begin
@@ -124,18 +139,31 @@ module stage_if (
             if2id_pipe.pred_taken <= '0;
             if2id_pipe.pc         <= '0;
             if2id_pipe.insts      <= '0;
-        end else if (btb_hit && if2id_pipe.valid) begin //btb hit
-            if2id_pipe.pred_taken[line_buf_offset] <= 1'b1; //predictor label
-            if2id_pipe.pc <= if2id_pipe.pc + insts_dispatched;
-        end else if (mispredict || (fully_dispatched && !next_line_buf_valid)) begin //mispredict or not prepared
+            line_pred             <= '0;
+            line_tgt              <= '0;
+        end else if (mispredict || pred_dispatched) begin //jump to another addr or jump incorrectly
             if2id_pipe.valid      <= `FALSE;
-        end else if (fully_dispatched /*&& next_line_buf_valid*/) begin
+            if2id_pipe.pred_taken <= '0;
+            line_pred             <= '0;
+        end else if (fully_dispatched && !next_line_buf_valid) begin
+            if2id_pipe.valid      <= `FALSE;
+            if2id_pipe.pred_taken <= '0;
+        end else if (fully_dispatched && next_line_buf_valid) begin // get new data
             if2id_pipe.valid      <= `TRUE;
             if2id_pipe.pc         <= PC_reg;
             if2id_pipe.insts      <= ic_data;
-        end else /*if (!mispredict && !fully_dispatched)*/ begin
+            line_pred             <= masked_pred;
+            line_tgt              <= raw_tgt;
+
+            if2id_pipe.pred_taken[0] <= masked_pred[start_off];
+            if2id_pipe.pred_taken[1] <= (start_off < 2'd3)? 
+                                        (masked_pred[start_off + 1] && !masked_pred[start_off]): 1'b0;
+        end else begin
             // if2id_pipe.valid must be true
             if2id_pipe.pc         <= if2id_pipe.pc + insts_dispatched;
+            if2id_pipe.pred_taken[0] <= line_pred[next_dispatch_off];
+            if2id_pipe.pred_taken[1] <= (next_dispatch_off < 2'd3) ? 
+                                        (line_pred[next_dispatch_off + 1] && !line_pred[next_dispatch_off]): 1'b0;
         end
     end
 endmodule // stage_if

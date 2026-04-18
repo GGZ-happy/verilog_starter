@@ -95,6 +95,17 @@ module cpu (
         .mem_addr(mem2proc_addr[1])
     );
 
+    
+    ////////////////////////////////////////////////
+    //                                            //
+    //                 btb update                 //
+    //                                            //
+    ////////////////////////////////////////////////
+
+    logic [1:0] btb_update_en;
+    ADDR  [1:0] btb_update_pc;
+    ADDR  [1:0] btb_update_target;
+
     //////////////////////////////////////////////////
     //                                              //
     //                   Stages                     //
@@ -114,7 +125,10 @@ module cpu (
         .ic_valid,
         .if_addr,
         .dbg_if_PC,
-        .if2id_pipe
+        .if2id_pipe,
+        .btb_update_en,
+        .btb_update_pc,
+        .btb_update_target
     );
 
     stage_id id_stage (
@@ -136,7 +150,10 @@ module cpu (
         .proc2mem_data,
         .ls2mem_addr(proc2mem_addr[0]),
         .ls2mem_command(proc2mem_command),
-        .wb2rf_pipe
+        .wb2rf_pipe,
+        .btb_update_en,
+        .btb_update_pc,
+        .btb_update_target
     );
 
     //////////////////////////////////////////////////
