@@ -105,6 +105,7 @@ module cpu (
     logic [1:0] btb_update_en;
     ADDR  [1:0] btb_update_pc;
     ADDR  [1:0] btb_update_target;
+    logic [1:0] btb_update_taken;
 
     //////////////////////////////////////////////////
     //                                              //
@@ -128,7 +129,8 @@ module cpu (
         .if2id_pipe,
         .btb_update_en,
         .btb_update_pc,
-        .btb_update_target
+        .btb_update_target,
+        .btb_update_taken
     );
 
     stage_id id_stage (
@@ -153,7 +155,8 @@ module cpu (
         .wb2rf_pipe,
         .btb_update_en,
         .btb_update_pc,
-        .btb_update_target
+        .btb_update_target,
+        .btb_update_taken
     );
 
     //////////////////////////////////////////////////

@@ -30,7 +30,8 @@ module stage_if (
     // btb port from WB
     input logic     [1:0] btb_update_en,
     input ADDR      [1:0] btb_update_pc,
-    input ADDR      [1:0] btb_update_target
+    input ADDR      [1:0] btb_update_target,
+    input logic     [1:0] btb_update_taken
 );
     //////////////////////////////////////////////////
     //                                              //
@@ -75,7 +76,8 @@ module stage_if (
         .target(raw_tgt),
         .update_en(btb_update_en),
         .update_pc(btb_update_pc),
-        .update_target(btb_update_target)
+        .update_target(btb_update_target),
+        .update_taken(btb_update_taken)  
     ); // btb
 
     //////////////////////////////////////////////////
