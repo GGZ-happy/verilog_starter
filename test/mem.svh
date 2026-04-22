@@ -19,8 +19,8 @@
 //////////////////////////////////
 
 // NOTE: the global CLOCK_PERIOD is defined in cpu.clock
-`define MEM_LATENCY_IN_CYCLES $rtoi((35.0-`CLOCK_PERIOD)/`CLOCK_PERIOD+0.49999)
-`define BUS_WIDTH 2
+`define MEM_LATENCY_IN_CYCLES $rtoi(35.0/`CLOCK_PERIOD)
+`define BUS_WIDTH 1
 
 `define CACHE_BLOCK_OFFSET_BITS 2
 `define CACHE_BLOCK_SIZE_IN_WORDS (1 << `CACHE_BLOCK_OFFSET_BITS)

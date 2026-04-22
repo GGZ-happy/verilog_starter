@@ -1,0 +1,37 @@
+Average CPI                                                  1.837903
+
+Testbench                                                    CPI
+----------------------------------------------------------   ------
+370p1spec                                                    2.235294
+370p2spec                                                    2.875000
+370p3spec                                                    3.500000
+370p4spec                                                    3.750000
+branch_storm_group4_f25                                      1.446387
+combination_group10_f25                                      2.554613
+combination_group12_f25                                      2.182196
+combination_group13_f25                                      1.934747
+combination_group18_f25                                      1.735390
+combination_group3_f25                                       2.013821
+factorial_group10_f25                                        1.059279
+factorial_group11_f25                                        1.228414
+factorial_group13_f25                                        0.986451
+factorial_group17_f25                                        1.494125
+factorial_group9_f25                                         1.466167
+factorial_subtraction_group14_f25                            1.069159
+fibonacci_factorial_group7_f25                               2.567534
+fibonacci_group10_f25                                        0.920783
+fibonacci_group13_f25                                        0.796156
+fibonacci_group16_f25                                        1.834219
+fibonacci_group17_f25                                        2.561634
+fibonacci_group18_f25                                        0.820423
+fibonacci_group19_f25                                        2.178411
+fibonacci_group2_f25                                         2.566190
+fibonacci_group6_f25                                         2.263110
+fibonacci_group9_f25                                         0.722901
+gcd_group10_f25                                              1.274695
+gcd_group15_f25                                              1.358965
+gcd_group8_f25                                               1.413175
+periodic_group1_f25                                          1.164620
+reg_coverage_group5_f25                                      2.016212
+walkthrough                                                  2.285714
+walkthroughNoop                                              2.375000

@@ -84,6 +84,7 @@ module cpu (
     MEM_BLOCK ic_data;
     logic ic_valid;
     ADDR if_addr;
+    ADDR ic2mem_addr;
 
     icache #(.NUM_LINES(`ICACHE_NUM_LINES)) ic (
         .clock,
@@ -92,10 +93,10 @@ module cpu (
         .ic_addr,
         .ic_data,
         .ic_valid,
-        .ic2mem_addr(proc2mem_addr[1]),
-        .mem_valid(mem2proc_valid[1]),
-        .mem_data(mem2proc_data[1]),
-        .mem_addr(mem2proc_addr[1])
+        .ic2mem_addr(ic2mem_addr),
+        .mem_valid(mem2proc_valid[0] && !ls_wants_mem),
+        .mem_data(mem2proc_data[0]),
+        .mem_addr(mem2proc_addr[0])
     );
 
     
@@ -117,13 +118,16 @@ module cpu (
 
     ////////////////////////////////////////////////
     //                                            //
-    //                 mem output                 //
+    //       mem output and distribution          //
     //                                            //
     ////////////////////////////////////////////////
-
+    
+    // LS has the priority, icache needs to wait
+    logic ls_wants_mem;
+    assign ls_wants_mem = (ex2wb_pipe.mem_command != MEM_NONE);
+    assign proc2mem_command = ls_wants_mem ? ex2wb_pipe.mem_command : MEM_LOAD;
+    assign proc2mem_addr[0] = ls_wants_mem ? ex2wb_pipe.ls_addr : ic2mem_addr;
     assign proc2mem_data = ex2wb_pipe.store_data;
-    assign proc2mem_addr[0] = ex2wb_pipe.ls_addr;
-    assign proc2mem_command = ex2wb_pipe.mem_command;
 
     //////////////////////////////////////////////////
     //                                              //
@@ -178,7 +182,7 @@ module cpu (
     );
 
     //////////////////////////////////////////////////
-    //              EX/WB Pipeline Register          //
+    //              EX/WB Pipeline Register         //
     //////////////////////////////////////////////////
 
     always_ff @(posedge clock) begin
