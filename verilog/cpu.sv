@@ -57,7 +57,11 @@ module cpu (
     // Outputs from ID stage and ID/EX Pipeline Register
     ID_PACKET id2ex_pipe;
 
-    // Outputs from WB stage and (later) EX/WB Pipeline Register
+    // Outputs from EX stage
+    EX_WB_PACKET ex_wb_out;
+    EX_WB_PACKET ex2wb_pipe; // EX/WB Pipeline Register
+
+    // Outputs from WB stage
     COM_PACKET wb2rf_pipe;
 
     // Pipeline backwards paths
@@ -66,7 +70,6 @@ module cpu (
     logic mispredict;
     ADDR  next_pc;
 
-    assign load_complete = wb2rf_pipe.valid[1];
     // For this impl of EX, LS unit always uses inst 1
     assign mispredict = wb2rf_pipe.mispredict;
     assign next_pc = wb2rf_pipe.next_pc;
@@ -107,6 +110,21 @@ module cpu (
     ADDR  [1:0] btb_update_target;
     logic [1:0] btb_update_taken;
 
+    assign btb_update_en = ex2wb_pipe.btb_update_en;
+    assign btb_update_pc = ex2wb_pipe.btb_update_pc;
+    assign btb_update_target = ex2wb_pipe.btb_update_target;
+    assign btb_update_taken = ex2wb_pipe.btb_update_taken;
+
+    ////////////////////////////////////////////////
+    //                                            //
+    //                 mem output                 //
+    //                                            //
+    ////////////////////////////////////////////////
+
+    assign proc2mem_data = ex2wb_pipe.store_data;
+    assign proc2mem_addr[0] = ex2wb_pipe.ls_addr;
+    assign proc2mem_command = ex2wb_pipe.mem_command;
+
     //////////////////////////////////////////////////
     //                                              //
     //                   Stages                     //
@@ -144,20 +162,31 @@ module cpu (
         .insts_dispatched
     );
 
-    stage_com com_stage (
+    stage_ex ex_stage (
         .id2ex_pipe,
+        .ex2wb_pipe,
+        .ex_wb_out
+    );
+
+    stage_wb wb_stage (
+        .ex2wb_pipe,
         .mem2proc_data,
         .mem2proc_addr,
         .mem2proc_valid,
-        .proc2mem_data,
-        .ls2mem_addr(proc2mem_addr[0]),
-        .ls2mem_command(proc2mem_command),
         .wb2rf_pipe,
-        .btb_update_en,
-        .btb_update_pc,
-        .btb_update_target,
-        .btb_update_taken
+        .load_complete
     );
+
+    //////////////////////////////////////////////////
+    //              EX/WB Pipeline Register          //
+    //////////////////////////////////////////////////
+
+    always_ff @(posedge clock) begin
+        if (reset || mispredict)
+            ex2wb_pipe <= '0;
+        else if (load_complete)
+            ex2wb_pipe <= ex_wb_out;
+    end
 
     //////////////////////////////////////////////////
     //                                              //

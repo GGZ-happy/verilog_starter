@@ -47,6 +47,27 @@ typedef struct packed {
     WORD        [1:0] valB;
 } ID_PACKET;
 
+// EX/WB Packet: Data exchanged from EX to WB stage
+typedef struct packed {
+    logic       [1:0] valid;
+    logic       [1:0] wr_en;
+    LC2K_OPCODE [1:0] opcode;
+    ADDR        [1:0] pc;
+    REG_IDX     [1:0] destReg;
+    WORD        [1:0] result;
+    logic       [1:0] pred_taken;
+    logic       [1:0] mispredict;
+    ADDR        [1:0] branch_target;
+    WORD              store_data;
+    MEM_COMMAND       mem_command;
+    ADDR              ls_addr;
+    // btb information
+    logic       [1:0] btb_update_en;
+    ADDR        [1:0] btb_update_pc;
+    ADDR        [1:0] btb_update_target;
+    logic       [1:0] btb_update_taken;
+} EX_WB_PACKET;
+
 // COM Packet: Tracking info from the writeback stage back to the register file
 typedef struct packed {
     logic   [2:0] valid;

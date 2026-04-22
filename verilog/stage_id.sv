@@ -39,13 +39,18 @@ module stage_id (
 
     genvar i;
     generate
+
+    INST [1:0] next_insts;
+    assign next_insts[0] = insts[line_buf_offset];
+    assign next_insts[1] = (line_buf_offset + 1 < 3'd4) ? insts[line_buf_offset + 1] : '0;
+
     for (i = 0; i <= 1; ++i) begin : inst_decode
         assign next_id2ex_pipe.pc[i] = if2id_pipe.pc + i;
         assign next_id2ex_pipe.pred_taken[i] = if2id_pipe.pred_taken[i];
-        assign next_id2ex_pipe.opcode[i] = insts[i+line_buf_offset].opcode;
-        assign next_id2ex_pipe.regA[i] = insts[i+line_buf_offset].regA;
-        assign next_id2ex_pipe.regB[i] = insts[i+line_buf_offset].regB;
-        assign next_id2ex_pipe.offset[i] = insts[i+line_buf_offset].arg2.i.offset;
+        assign next_id2ex_pipe.opcode[i] = next_insts[i].opcode;
+        assign next_id2ex_pipe.regA[i] = next_insts[i].regA;
+        assign next_id2ex_pipe.regB[i] = next_insts[i].regB;
+        assign next_id2ex_pipe.offset[i] = next_insts[i].arg2.i.offset;
         // ADD, NOR, SW, BEQ, NAND read 2 regs
         // LW, JALR, ADDI read just regA
         assign regB_is_dest[i]
@@ -67,10 +72,18 @@ module stage_id (
             && next_id2ex_pipe.opcode[i] != LC2K_BEQ;
         assign next_id2ex_pipe.destReg[i]
             = regB_is_dest[i]
-            ? insts[i+line_buf_offset].regB
-            : insts[i+line_buf_offset].arg2.r.destReg;
+            ? next_insts[i].regB
+            : next_insts[i].arg2.r.destReg;
     end
     endgenerate
+    // Check if load hazard happen
+    logic load_use_hazard;
+    assign load_use_hazard = 
+        (id2ex_pipe.valid[1] && id2ex_pipe.opcode[1] == LC2K_LW &&
+            ((reads_regA[0] && next_id2ex_pipe.regA[0] == id2ex_pipe.destReg[1])
+            || (reads_2_regs[0] && next_id2ex_pipe.regB[0] == id2ex_pipe.destReg[1])
+            || (reads_regA[1] && next_id2ex_pipe.regA[1] == id2ex_pipe.destReg[1])
+            || (reads_2_regs[1] && next_id2ex_pipe.regB[1] == id2ex_pipe.destReg[1])));
 
     // Validity/issue logic is tricky.
     logic RAW, WAW; // No need to do WAR here, but the uOpQ will need it
@@ -85,7 +98,7 @@ module stage_id (
     // If a branch is issued with another non-memory op, inst 0 will go first
     logic swizzle;
     assign swizzle = accs_mem[0];
-    assign next_id2ex_pipe.valid[0] = !mispredict && if2id_pipe.valid;
+    assign next_id2ex_pipe.valid[0] = !mispredict && if2id_pipe.valid && !load_use_hazard;
     assign next_id2ex_pipe.valid[1] = !mispredict && next_id2ex_pipe.opcode[0] != LC2K_HALT
         && ((next_id2ex_pipe.opcode[0] != LC2K_BEQ && next_id2ex_pipe.opcode[0] != LC2K_JALR)
             || !accs_mem[1]) 
@@ -94,10 +107,9 @@ module stage_id (
         && (line_buf_offset + 1) < `CACHE_BLOCK_SIZE_IN_WORDS
         && !if2id_pipe.pred_taken[0];
 
-    assign insts_dispatched = 
-        (!load_complete && id2ex_pipe.valid[1] && id2ex_pipe.opcode[1] == LC2K_LW) ? 2'd0 : 
-        (next_id2ex_pipe.valid == 2'b00) ? 2'd0 :
-        (next_id2ex_pipe.valid == 2'b11) ? 2'd2 : 2'd1;
+    assign insts_dispatched = (!load_complete || load_use_hazard) ? 2'd0 :
+                                (next_id2ex_pipe.valid == 2'b00) ? 2'd0 :
+                                (next_id2ex_pipe.valid == 2'b11) ? 2'd2 : 2'd1;
 
     // Instantiate the register file
     regfile regs (
@@ -114,7 +126,7 @@ module stage_id (
     always_ff @(posedge clock) begin
         if (reset) begin
             id2ex_pipe <= '0;
-        end else if (load_complete || !id2ex_pipe.valid[1] || id2ex_pipe.opcode[1] != LC2K_LW) begin
+        end else if (load_complete && !load_use_hazard) begin
             if (swizzle) begin
                 id2ex_pipe.valid      <= {next_id2ex_pipe.valid[0],       next_id2ex_pipe.valid[1]};
                 id2ex_pipe.pred_taken <= {next_id2ex_pipe.pred_taken[0],  next_id2ex_pipe.pred_taken[1]};
@@ -129,6 +141,8 @@ module stage_id (
             end else begin
                 id2ex_pipe <= next_id2ex_pipe;
             end
+        end else if (load_complete && load_use_hazard) begin
+                id2ex_pipe <= '0;  // insert bubble
         end // else leave id2ex_pipe as-is
     end
 endmodule // stage_id
